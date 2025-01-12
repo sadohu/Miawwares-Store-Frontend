@@ -8,6 +8,7 @@ import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
 import { AuthService } from '../../services/auth.service';
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -17,18 +18,21 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
   email: string = '';
-
   password: string = '';
-
   checked: boolean = false;
+  user: User = new User();
 
   constructor(private authService: AuthService) { }
 
   logIng() {
-    console.log("this.email", this.email);
-    console.log("this.password", this.password);
-    this.authService.logIn(this.email, this.password).subscribe((data) => {
-      console.log("data", data);
+    this.user.username = this.email;
+    this.user.password = this.password
+
+    this.authService.logIn(this.user).subscribe((data) => {
+      this.user.accessToken = data.accessToken;
+      this.user.refreshToken = data.refreshToken;
+      console.log(this.user);
     });
+
   }
 }
