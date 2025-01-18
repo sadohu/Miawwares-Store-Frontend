@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HttpStatusCode } from '@angular/common/http';
+import { RouterModule, Router } from '@angular/router';
 import { StyleClassModule } from 'primeng/styleclass';
+import { MenuItem } from 'primeng/api';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
+import { AuthService } from '../../services/auth.service';
+import { Auth } from '../../models/auth.model';
+import { SwalCustoms } from '../../Utils/SwalCustoms';
 
 @Component({
     selector: 'app-topbar',
@@ -76,6 +80,10 @@ import { LayoutService } from '../service/layout.service';
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
+                    <button type="button" class="layout-topbar-action" (click)="logOut()">
+                        <i class="pi pi-sign-out"></i>
+                        <span>Settings</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -84,9 +92,46 @@ import { LayoutService } from '../service/layout.service';
 export class AppTopbar {
     items!: MenuItem[];
 
-    constructor(public layoutService: LayoutService) {}
+    constructor(public layoutService: LayoutService, private authService: AuthService, private router: Router) { }
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
+
+    logOut() {
+        const localAuth = this.authService.getAuthOnSessionStorage();
+
+        if (!localAuth) {
+            console.warn("Auth no encontrado");
+            this.router.navigate(['auth/login']);
+            return;
+        }
+        // console.log("localUser", localAuth);
+
+        this.authService.logOut(localAuth).subscribe({
+            // Manage errors
+            error: (error) => {
+                if (error.status == HttpStatusCode.Unauthorized) {
+                    const msg = error.error.error;
+                    SwalCustoms.error("Token expirado");
+                    this.authService.clearSessionStorage();
+                    console.log(msg);
+                } else {
+                    this.authService.clearSessionStorage();
+                    console.error(error);
+                    SwalCustoms.error("Error al cerrar sesión");
+                }
+            },
+
+            // Manage response
+            next: (response) => {
+                console.log(response);
+                SwalCustoms.nyanAlert("Sesión cerrada correctamente");
+                this.authService.clearSessionStorage();
+                this.router.navigate(['auth/login']);
+            }
+        });
+    }
+
+
 }

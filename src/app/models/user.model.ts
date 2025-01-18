@@ -1,6 +1,10 @@
 export class User {
+    idVendedor?: number;
+    nombre?: string;
+    foto?: string;
+    dni?: string;
+    tfno?: string;
     username?: string;
-    password?: string;
-    accessToken?: string;
-    refreshToken?: string;
+    email?: string;
+    idRol?: number;
 }
