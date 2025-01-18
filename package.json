@@ -26,6 +26,7 @@
         "primeng": "^19.0.5",
         "rxjs": "~7.8.0",
         "sakai-ng": "file:",
+        "sweetalert2": "^11.10.1",
         "tailwindcss-primeui": "^0.3.2",
         "tslib": "^2.3.0",
         "zone.js": "~0.15.0"
