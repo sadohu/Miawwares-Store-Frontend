@@ -89,6 +89,11 @@ export class AppMenu {
                         label: 'Empty',
                         icon: 'pi pi-fw pi-circle-off',
                         routerLink: ['/pages/empty']
+                    },
+                    {
+                        label: 'Vendedor',
+                        icon: 'pi pi-fw pi-user',
+                        routerLink: ['/pages/vendedor']
                     }
                 ]
             },
