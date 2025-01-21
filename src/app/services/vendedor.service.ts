@@ -19,4 +19,21 @@ export class VendedorService {
   saveVendedor(formData: FormData): Observable<any> {
     return this.http.post(`${API_ENDPOINT}/vendedores`, formData);
   }
+
+  setFormData(vendedor: VendedorDto, foto: any): FormData {
+    const formData = new FormData();
+    formData.append('nombre', vendedor.nombre!);
+    formData.append('dni', vendedor.dni!);
+    formData.append('tfno', vendedor.tfno!);
+    formData.append('username', vendedor.username!);
+    formData.append('email', vendedor.email!);
+    formData.append('password', vendedor.password!);
+    formData.append('idRol', vendedor.idRol!.toString());
+    formData.append('foto', foto!);
+
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(key + ": " + value);
+    // }
+    return formData;
+  }
 }

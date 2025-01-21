@@ -112,31 +112,18 @@ export class VendedorComponent implements OnInit {
     });
   }
 
-  // onUpload(event: any) {
-  //   console.log("uploadedFiles: ", this.uploadedFiles);
-  //   const uploadedFiles = event.files[0]; // Obtener el primer archivo subido
-  //   console.log("uploadedFiles: ", uploadedFiles);
+  onFileChange(event: any) {
+    const file = event.files[0]; // Obtener el primer archivo subido
+    if (file) {
+      this.uploadedFiles = [file];
+      console.log("Archivo seleccionado: ", file);
+    }
+  }
 
-  //   this.item.fotoFile = this.uploadedFiles;
-  //   console.log("this.item.fotoFile: ", this.item.fotoFile);
-
-  //   this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
-  // }
 
   createVendedor() {
-    console.log("Creando vendedor...");
-    console.log("uploadedFiles: ", this.uploadedFiles);
-    const formData = new FormData();
-    formData.append('nombre', this.item.nombre!);
-    formData.append('tfno', this.item.tfno!);
-    formData.append('username', this.item.username!);
-    formData.append('email', this.item.email!);
-    formData.append('dni', this.item.dni!);
-    formData.append('password', this.item.password!);
-    formData.append('idRol', this.item.idRol!.toString());
-    formData.append('foto', this.uploadedFiles[0]);
-    console.log("formData: ", formData);
-
+    // set formData
+    const formData = this.vendedorService.setFormData(this.item, this.uploadedFiles[0]);
 
     // init Save Vendedor
     this.vendedorService.saveVendedor(formData).subscribe({
@@ -149,25 +136,6 @@ export class VendedorComponent implements OnInit {
       }
     });
     // end Save Vendedor
-
-    // this.utilService.convertirImagenesABase64(this.uploadedFiles).subscribe((data) => {
-    //   // console.log("Imagenes convertidas: ", data);
-    //   this.item.foto = data[0].base64;
-    //   console.log("Vendedor: ", this.item);
-
-
-
-
-    // });
-
-
-
-
-
-
-    // this.vendedorService.createVendedor().subscribe((data) => {
-    //   console.log("Vendedor creado: ", data);
-    // });
   }
 
   updateVendedor() {

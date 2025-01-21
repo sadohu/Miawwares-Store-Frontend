@@ -100,7 +100,7 @@
                     <div class="font-semibold text-xl mb-4">Foto</div>
                     <p-fileupload name="foto" accept="image/*" maxFileSize="1000000" mode="advanced"
                         url="https://www.primefaces.org/cdn/api/upload.php" multiple="false" fileLimit="1"
-                        formData="formData">
+                        formData="formData" (onSelect)="onFileChange($event)">
 
                         <ng-template #empty>
                             <div>Drag and drop files to here to upload.</div>
