@@ -31,35 +31,35 @@ interface ExportColumn {
 })
 export class VendedorComponent implements OnInit {
 
-  productDialog: boolean = false;
-
   // Vendedores
   itemDialog: boolean = false;
-  listItems: VendedorDto[] = [];
-  item!: VendedorDto;
-  selectedItems!: VendedorDto[] | null;
-
+  // listItems: Vendedor[] = [];
+  listItems = signal<Vendedor[]>([]);
+  selectedItems: Vendedor[] = [];
   roles: Rol[] = [];
-
+  // Dialog
+  item!: VendedorDto;
   uploadedFiles: File[] = [];
 
+
+  // Utils
   msgs: ToastMessageOptions[] | null = [];
+  submitted: boolean = false;
+  statuses!: any[];
+  productDialog: boolean = false;
+  @ViewChild('dt')
+  dt!: Table;
+  exportColumns!: ExportColumn[];
+  columns!: Column[];
   imageUrl: string | null = null;
 
 
   // Others
-
   products = signal<Product[]>([]);
   product!: Product;
   selectedProducts!: Product[] | null;
 
-  submitted: boolean = false;
-  statuses!: any[];
 
-  @ViewChild('dt')
-  dt!: Table;
-  exportColumns!: ExportColumn[];
-  cols!: Column[];
 
   constructor(
     private productService: ProductService,
@@ -75,7 +75,7 @@ export class VendedorComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadDemoData();
+    this.loadData();
     this.rolService.getRoles().subscribe((data) => {
       this.roles = data;
       // console.log("roles: ", this.roles);
@@ -83,9 +83,10 @@ export class VendedorComponent implements OnInit {
     });
   }
 
-  loadDemoData() {
-    this.productService.getProducts().then((data) => {
-      this.products.set(data);
+  loadData() {
+    this.vendedorService.getVendedores().subscribe((data) => {
+      console.log("Vendedores: ", data);
+      this.listItems.set(data);
     });
 
     this.statuses = [
@@ -94,15 +95,19 @@ export class VendedorComponent implements OnInit {
       { label: 'OUTOFSTOCK', value: 'outofstock' }
     ];
 
-    this.cols = [
-      { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-      { field: 'name', header: 'Name' },
-      { field: 'image', header: 'Image' },
-      { field: 'price', header: 'Price' },
-      { field: 'category', header: 'Category' }
+    this.columns = [
+      { field: 'idVendedor', header: 'Codigo Vendedor', customExportHeader: 'Condigo Vendedor' },
+      { field: 'foto', header: 'Foto' },
+      { field: 'nombre', header: 'Nombre' },
+      { field: 'dni', header: 'DNI' },
+      { field: 'tfno', header: 'Telefono' },
+      { field: 'email', header: 'Email' },
+      { field: 'username', header: 'Usuario' },
+      { field: 'idRol', header: 'Rol' },
     ];
 
-    this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+    this.exportColumns = this.columns.map((col) => ({ title: col.header, dataKey: col.field }));
+
   }
 
   // INIT CRUD VENDEDORES
@@ -230,18 +235,25 @@ export class VendedorComponent implements OnInit {
     return id;
   }
 
-  getSeverity(status: string) {
+  // INICIO ESTILOS PARA TABLA
+  getSeverity(status: number) {
     switch (status) {
-      case 'INSTOCK':
+      case 1:
         return 'success';
-      case 'LOWSTOCK':
+      case 2:
         return 'warn';
-      case 'OUTOFSTOCK':
+      case 3:
         return 'danger';
       default:
         return 'info';
     }
   }
+
+  getRol(idRol: number) {
+    const rol = this.roles.find(rol => rol.idRol === idRol);
+    return rol?.nombreRol;
+  }
+  // FIN ESTILOS PARA TABLA
 
   saveProduct() {
     this.submitted = true;

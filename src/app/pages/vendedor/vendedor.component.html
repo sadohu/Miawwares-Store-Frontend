@@ -16,26 +16,41 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="products()" [rows]="10" [columns]="cols" [paginator]="true"
-        [globalFilterFields]="['name', 'country.name', 'representative.name', 'status']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedProducts" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" [showCurrentPageReport]="true"
-        [rowsPerPageOptions]="[10, 20, 30]">
+    <!-- Tabla de objetos -->
+    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
+        [globalFilterFields]="['idVendedor', 'nombre', 'email', 'username', 'idRol']"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedItems" [rowHover]="true" dataKey="idVendedor"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} vendedores"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]">
+
+        <!-- Titulo de la tabla -->
         <ng-template #caption>
             <div class="flex items-center justify-between">
-                <h5 class="m-0">Manage Products</h5>
+                <h5 class="m-0">Lista de vendedores</h5>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-search" />
                     <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
                 </p-iconfield>
             </div>
         </ng-template>
+
+        <!-- Cabecera de la tabla -->
         <ng-template #header>
             <tr>
-                <th style="width: 3rem">
+                <!-- CheckBox Header -->
+                <th class="w-12">
                     <p-tableHeaderCheckbox />
                 </th>
-                <th style="min-width: 16rem">Code</th>
+
+                <!-- Columnas Header -->
+                <th class="w-48" *ngFor="let col of columns" pSortableColumn="{{ col.field }}">
+                    <span>{{ col.header }}</span>
+                    <!-- <p-sortIcon [field]="col.field" [ngClass]="{'p-sortable-column': col.sortable}" /> -->
+                </th>
+
+
+
+                <!-- <th style="min-width: 16rem">Code</th>
                 <th pSortableColumn="name" style="min-width:16rem">
                     Name
                     <p-sortIcon field="name" />
@@ -56,16 +71,53 @@
                 <th pSortableColumn="inventoryStatus" style="min-width: 12rem">
                     Status
                     <p-sortIcon field="inventoryStatus" />
-                </th>
+                </th> -->
+
+                <!-- Buttons Header -->
                 <th style="min-width: 12rem"></th>
             </tr>
         </ng-template>
-        <ng-template #body let-product>
+
+        <!-- Cuerpo de la tabla -->
+        <ng-template #body let-item>
             <tr>
-                <td style="width: 3rem">
-                    <p-tableCheckbox [value]="product" />
+                <!-- Checkbox Body -->
+                <td class="w-12">
+                    <p-tableCheckbox [value]="item" />
                 </td>
-                <td style="min-width: 12rem">{{ product.code }}</td>
+                <!-- <td style="width: 3rem">
+                    <p-tableCheckbox [value]="item" [(ngModel)]="selectedItems" />
+                </td> -->
+
+                <!-- Columnas Body -->
+                <!-- <td class="min-w-32" *ngFor="let col of columns">
+                    <span>{{ item[col.field] }}</span>
+                </td> -->
+
+                <ng-container *ngFor="let col of columns">
+                    <!-- Si es foto -->
+                    <td *ngIf="col.field === 'foto'; else notFoto" class="min-w-16">
+                        <img [src]="item[col.field]" [alt]="item[col.field]" style="width: 64px" class="rounded"
+                            [ngStyle]="{'width': '64px'}" />
+                    </td>
+
+                    <!-- Si es rol -->
+                    <ng-template #notFoto>
+                        <td *ngIf="col.field === 'idRol'; else otherField" class="min-w-32">
+                            <p-tag [value]="getRol(item[col.field])" [severity]="getSeverity(item[col.field])" />
+                        </td>
+                    </ng-template>
+
+                    <!-- Cualquier otro caso -->
+                    <ng-template #otherField>
+                        <td class="min-w-32">
+                            <span>{{ item[col.field] }}</span>
+                        </td>
+                    </ng-template>
+                </ng-container>
+
+
+                <!-- <td style="min-width: 12rem">{{ product.code }}</td>
                 <td style="min-width: 16rem">{{ product.name }}</td>
                 <td>
                     <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image"
@@ -78,12 +130,14 @@
                 </td>
                 <td>
                     <p-tag [value]="product.inventoryStatus" [severity]="getSeverity(product.inventoryStatus)" />
-                </td>
+                </td> -->
+
+                <!-- Buttons Body -->
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        (click)="editProduct(product)" />
+                        (click)="editProduct(item)" />
                     <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                        (click)="deleteProduct(product)" />
+                        (click)="deleteProduct(item)" />
                 </td>
             </tr>
         </ng-template>
