@@ -17,8 +17,7 @@
     </p-toolbar>
 
     <!-- Tabla de objetos -->
-    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
-        [globalFilterFields]="['idVendedor', 'nombre', 'email', 'username', 'idRol']"
+    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true" [globalFilterFields]="['rol']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedItems" [rowHover]="true" dataKey="idVendedor"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} vendedores"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]">
@@ -103,8 +102,9 @@
 
                     <!-- Si es rol -->
                     <ng-template #notFoto>
-                        <td *ngIf="col.field === 'idRol'; else otherField" class="min-w-32">
-                            <p-tag [value]="getRol(item[col.field])" [severity]="getSeverity(item[col.field])" />
+                        <td *ngIf="col.field === 'rol'; else otherField" class="min-w-32">
+                            <!-- <p-tag  [value]="getRol(item[col.field])" [severity]="getSeverity(item[col.field])" /> -->
+                            <p-tag [value]="item[col.field]" [severity]="getSeverity(item[col.field])" />
                         </td>
                     </ng-template>
 

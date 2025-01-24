@@ -1,6 +1,7 @@
 export class VendedorDto {
     idVendedor?: number;
     nombre?: string;
+    foto?: string;
     fotoFile?: any;
     dni?: string;
     tfno?: string;
@@ -8,4 +9,5 @@ export class VendedorDto {
     email?: string;
     password?: string;
     idRol?: number;
+    rol?: string;
 }

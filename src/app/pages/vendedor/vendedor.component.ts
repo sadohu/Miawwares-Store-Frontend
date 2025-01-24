@@ -34,7 +34,7 @@ export class VendedorComponent implements OnInit {
   // Vendedores
   itemDialog: boolean = false;
   // listItems: Vendedor[] = [];
-  listItems = signal<Vendedor[]>([]);
+  listItems = signal<VendedorDto[]>([]);
   selectedItems: Vendedor[] = [];
   roles: Rol[] = [];
   // Dialog
@@ -75,18 +75,22 @@ export class VendedorComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadData();
     this.rolService.getRoles().subscribe((data) => {
       this.roles = data;
-      // console.log("roles: ", this.roles);
-      // console.log("roles1: ", this.roles[0]);
+      this.loadData();
     });
   }
 
   loadData() {
     this.vendedorService.getVendedores().subscribe((data) => {
       console.log("Vendedores: ", data);
-      this.listItems.set(data);
+      const vendedores = data.map((vendedor: VendedorDto) => {
+        const rol = this.roles.find(rol => rol.idRol === vendedor.idRol);
+        return { ...vendedor, rol: rol?.nombreRol };
+      });
+      console.log("Vendedores1: ", vendedores);
+
+      this.listItems.set(vendedores);
     });
 
     this.statuses = [
@@ -103,7 +107,7 @@ export class VendedorComponent implements OnInit {
       { field: 'tfno', header: 'Telefono' },
       { field: 'email', header: 'Email' },
       { field: 'username', header: 'Usuario' },
-      { field: 'idRol', header: 'Rol' },
+      { field: 'rol', header: 'Rol' },
     ];
 
     this.exportColumns = this.columns.map((col) => ({ title: col.header, dataKey: col.field }));
@@ -167,9 +171,9 @@ export class VendedorComponent implements OnInit {
     this.itemDialog = true;
   }
 
-  editProduct(product: Product) {
-    this.product = { ...product };
-    this.productDialog = true;
+  editProduct(item: Vendedor) {
+    this.item = { ...item };
+    this.itemDialog = true;
   }
 
   deleteSelectedProducts() {
@@ -236,16 +240,16 @@ export class VendedorComponent implements OnInit {
   }
 
   // INICIO ESTILOS PARA TABLA
-  getSeverity(status: number) {
-    switch (status) {
-      case 1:
+  getSeverity(rol: string) {
+    switch (rol) {
+      case 'Administrador':
         return 'success';
-      case 2:
+      case 'Supervisor':
         return 'warn';
-      case 3:
-        return 'danger';
-      default:
+      case 'Vendedor':
         return 'info';
+      default:
+        return 'danger';
     }
   }
 
