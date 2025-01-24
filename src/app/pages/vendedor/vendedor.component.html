@@ -17,7 +17,8 @@
     </p-toolbar>
 
     <!-- Tabla de objetos -->
-    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true" [globalFilterFields]="['rol']"
+    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
+        [globalFilterFields]="['idVendedor', 'nombre', 'dni', 'tfno', 'email', 'username', 'rol']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedItems" [rowHover]="true" dataKey="idVendedor"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} vendedores"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]">
