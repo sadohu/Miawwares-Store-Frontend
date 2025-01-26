@@ -31,6 +31,7 @@ interface ExportColumn {
 })
 export class VendedorComponent implements OnInit {
 
+  @ViewChild('fileUploader') fileUploader: any;
   // Vendedores
   itemDialog: boolean = false;
   // listItems: Vendedor[] = [];
@@ -142,7 +143,18 @@ export class VendedorComponent implements OnInit {
       next: data => {
         console.log("Vendedor creado: ", data);
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Vendedor creado' });
+        //resetear item y upladoFiles
+        this.item = {};
+        //no se mano, espero haberte ayudado.
+        this.uploadedFiles = [];
+
+        //this.submitted = false;
+
+        if (this.fileUploader) {
+          this.fileUploader.clear();
+        }
       }
+      
     });
     // end Save Vendedor
   }

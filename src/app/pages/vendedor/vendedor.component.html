@@ -6,8 +6,7 @@
     <p-toolbar styleClass="mb-6">
         <ng-template #start>
             <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-            <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
-                (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
+            <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
         </ng-template>
 
         <ng-template #end>
@@ -17,12 +16,21 @@
     </p-toolbar>
 
     <!-- Tabla de objetos -->
-    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
+    <p-table
+        #dt
+        [value]="listItems()"
+        [rows]="10"
+        [columns]="columns"
+        [paginator]="true"
         [globalFilterFields]="['idVendedor', 'nombre', 'dni', 'tfno', 'email', 'username', 'rol']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedItems" [rowHover]="true" dataKey="idVendedor"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [(selection)]="selectedItems"
+        [rowHover]="true"
+        dataKey="idVendedor"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} vendedores"
-        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]">
-
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 20, 30]"
+    >
         <!-- Titulo de la tabla -->
         <ng-template #caption>
             <div class="flex items-center justify-between">
@@ -47,8 +55,6 @@
                     <span>{{ col.header }}</span>
                     <!-- <p-sortIcon [field]="col.field" [ngClass]="{'p-sortable-column': col.sortable}" /> -->
                 </th>
-
-
 
                 <!-- <th style="min-width: 16rem">Code</th>
                 <th pSortableColumn="name" style="min-width:16rem">
@@ -97,8 +103,7 @@
                 <ng-container *ngFor="let col of columns">
                     <!-- Si es foto -->
                     <td *ngIf="col.field === 'foto'; else notFoto" class="min-w-16">
-                        <img [src]="item[col.field]" [alt]="item[col.field]" style="width: 64px" class="rounded"
-                            [ngStyle]="{'width': '64px'}" />
+                        <img [src]="item[col.field]" [alt]="item[col.field]" style="width: 64px" class="rounded" [ngStyle]="{ width: '64px' }" />
                     </td>
 
                     <!-- Si es rol -->
@@ -117,7 +122,6 @@
                     </ng-template>
                 </ng-container>
 
-
                 <!-- <td style="min-width: 12rem">{{ product.code }}</td>
                 <td style="min-width: 16rem">{{ product.name }}</td>
                 <td>
@@ -135,10 +139,8 @@
 
                 <!-- Buttons Body -->
                 <td>
-                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        (click)="editProduct(item)" />
-                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                        (click)="deleteProduct(item)" />
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(item)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(item)" />
                 </td>
             </tr>
         </ng-template>
@@ -153,10 +155,18 @@
                     [alt]="product.image" class="block m-auto pb-4" *ngIf="product.image" /> -->
                 <div class="card">
                     <div class="font-semibold text-xl mb-4">Foto</div>
-                    <p-fileupload name="foto" accept="image/*" maxFileSize="1000000" mode="advanced"
-                        url="https://www.primefaces.org/cdn/api/upload.php" multiple="false" fileLimit="1"
-                        formData="formData" (onSelect)="onFileChange($event)">
-
+                    <p-fileupload
+                        #fileUploader
+                        name="foto"
+                        accept="image/*"
+                        maxFileSize="1000000"
+                        mode="advanced"
+                        url="https://www.primefaces.org/cdn/api/upload.php"
+                        multiple="false"
+                        fileLimit="1"
+                        formData="formData"
+                        (onSelect)="onFileChange($event)"
+                    >
                         <ng-template #empty>
                             <div>Drag and drop files to here to upload.</div>
                         </ng-template>
@@ -200,9 +210,7 @@
 
                 <div>
                     <label for="rol" class="block font-bold mb-3">Rol del Vendedor</label>
-                    <p-select class="w-full " [(ngModel)]="item.idRol" inputId="rol" [options]="roles"
-                        optionLabel="nombreRol" optionValue="idRol" placeholder="Selecciona un rol" fluid
-                        [appendTo]="'body'" />
+                    <p-select class="w-full" [(ngModel)]="item.idRol" inputId="rol" [options]="roles" optionLabel="nombreRol" optionValue="idRol" placeholder="Selecciona un rol" fluid [appendTo]="'body'" />
                 </div>
 
                 <div>
@@ -213,11 +221,9 @@
 
                 <div>
                     <label for="password" class="block font-bold mb-3">Contraseña</label>
-                    <input type="password" pInputText id="password" [(ngModel)]="item.password" required autofocus
-                        fluid />
+                    <input type="password" pInputText id="password" [(ngModel)]="item.password" required autofocus fluid />
                     <small class="text-red-500" *ngIf="submitted && !item.password">Password is required.</small>
                 </div>
-
 
                 <!-- <div>
                     <span class="block font-bold mb-4">Category</span>
