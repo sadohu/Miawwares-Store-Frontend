@@ -5,8 +5,9 @@
     <!-- Toolbar -->
     <p-toolbar styleClass="mb-6">
         <ng-template #start>
-            <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-            <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
+            <p-button id="btnNew" label="New" icon="pi pi-plus" severity="secondary" class="mr-2"
+                (onClick)="openNew()" />
+            <p-button id="btnMultiDelete" severity="secondary" label="Delete" icon="pi pi-trash" outlined
                 (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
         </ng-template>
 
@@ -17,7 +18,7 @@
     </p-toolbar>
 
     <!-- Tabla de objetos -->
-    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
+    <p-table #dt id="dataTable" [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
         [globalFilterFields]="['idVendedor', 'nombre', 'dni', 'tfno', 'email', 'username', 'rol']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedItems" [rowHover]="true" dataKey="idVendedor"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} vendedores"
@@ -131,10 +132,10 @@
 
                 <!-- Buttons Body -->
                 <td>
-                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        (click)="editItem(item)" />
-                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                        (click)="deleteItem(item)" />
+                    <p-button [id]="'btnEdit-' + item.idVendedor" icon="pi pi-pencil" class="mr-2" [rounded]="true"
+                        [outlined]="true" (click)="editItem(item)" />
+                    <p-button [id]="'btnDelete-' + item.idVendedor" icon="pi pi-trash" severity="danger"
+                        [rounded]="true" [outlined]="true" (click)="deleteItem(item)" />
                 </td>
             </tr>
         </ng-template>
@@ -255,9 +256,11 @@
         </ng-template>
 
         <ng-template #footer>
-            <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-            <p-button label="Save" icon="pi pi-check" (click)="createVendedor()" *ngIf="!isItemDialogEdit" />
-            <p-button label="Update" icon="pi pi-check" (click)="updateVendedor()" *ngIf="isItemDialogEdit" />
+            <p-button id="btnCancel" label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+            <p-button id="btnSave" label="Save" icon="pi pi-check" (click)="createVendedor()"
+                *ngIf="!isItemDialogEdit" />
+            <p-button id="btnUpdate" label="Update" icon="pi pi-check" (click)="updateVendedor()"
+                *ngIf="isItemDialogEdit" />
         </ng-template>
     </p-dialog>
 
