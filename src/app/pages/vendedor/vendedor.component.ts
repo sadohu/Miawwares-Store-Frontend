@@ -10,6 +10,7 @@ import { VendedorService } from '../../services/vendedor.service';
 import { Rol } from '../../models/rol.model';
 import { RolService } from '../../services/rol.service';
 import { UtilServiceService } from '../../services/util-service.service';
+import { SwalCustoms } from '../../Utils/SwalCustoms';
 
 interface Column {
   field: string;
@@ -160,7 +161,9 @@ export class VendedorComponent implements OnInit {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Vendedor creado' });
 
         // Actualizar la lista de vendedores
-        this.listItems.update((items) => [...items, { ...data, rol: this.getRol(data.idRol) }]);
+        // TODO: Arreglar ROLES
+        data.rol = this.getRol(data.idRol);
+        this.listItems.update((items) => [...items, { ...data }]);
       }
     });
     // end Save Vendedor
@@ -205,10 +208,27 @@ export class VendedorComponent implements OnInit {
     });
   }
 
-  deleteVendedor() {
-    // this.vendedorService.deleteVendedor().subscribe((data) => {
-    //   console.log("Vendedor eliminado: ", data);
-    // });
+  deleteItem(item: VendedorDto) {
+    SwalCustoms.confirm("¿Estás seguro de eliminar este vendedor?", "No podrás revertir esta acción").then((result: any) => {
+      if (result) {
+        this.vendedorService.deleteVendedor(item.idVendedor!).subscribe({
+          error: error => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error });
+          },
+          next: data => {
+            console.log("Vendedor eliminado: ", data);
+            // Actualizar la lista de vendedores
+            const vendedores = this.listItems().filter((vendedor: VendedorDto) => vendedor.idVendedor !== item.idVendedor);
+
+            // Actualizar la lista de vendedores
+            this.listItems.set(vendedores);
+
+            // Mostrar mensaje de éxito
+            this.messageService.add({ severity: 'info', summary: 'Info', detail: 'Vendedor eliminado' });
+          }
+        });
+      }
+    });
   }
 
   // END CRUD VENDEDORES
@@ -224,7 +244,7 @@ export class VendedorComponent implements OnInit {
     this.isItemDialogEdit = false;
   }
 
-  editProduct(item: Vendedor) {
+  editItem(item: Vendedor) {
     this.item = { ...item };
     this.itemDialog = true;
     this.isItemDialogEdit = true;
