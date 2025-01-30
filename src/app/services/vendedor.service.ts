@@ -20,6 +20,12 @@ export class VendedorService {
     return this.http.post(`${API_ENDPOINT}/vendedores`, formData);
   }
 
+  updateVendedor(id: number, formData: FormData): Observable<any> {
+    return this.http.put(`${API_ENDPOINT}/vendedores/${id}`, formData);
+  }
+
+
+
   setFormData(vendedor: VendedorDto, foto: any): FormData {
     const formData = new FormData();
     formData.append('nombre', vendedor.nombre!);

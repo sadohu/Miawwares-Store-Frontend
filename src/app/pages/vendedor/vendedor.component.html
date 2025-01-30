@@ -6,7 +6,8 @@
     <p-toolbar styleClass="mb-6">
         <ng-template #start>
             <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-            <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
+            <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
+                (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
         </ng-template>
 
         <ng-template #end>
@@ -16,21 +17,11 @@
     </p-toolbar>
 
     <!-- Tabla de objetos -->
-    <p-table
-        #dt
-        [value]="listItems()"
-        [rows]="10"
-        [columns]="columns"
-        [paginator]="true"
+    <p-table #dt [value]="listItems()" [rows]="10" [columns]="columns" [paginator]="true"
         [globalFilterFields]="['idVendedor', 'nombre', 'dni', 'tfno', 'email', 'username', 'rol']"
-        [tableStyle]="{ 'min-width': '75rem' }"
-        [(selection)]="selectedItems"
-        [rowHover]="true"
-        dataKey="idVendedor"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedItems" [rowHover]="true" dataKey="idVendedor"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} vendedores"
-        [showCurrentPageReport]="true"
-        [rowsPerPageOptions]="[10, 20, 30]"
-    >
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]">
         <!-- Titulo de la tabla -->
         <ng-template #caption>
             <div class="flex items-center justify-between">
@@ -103,7 +94,8 @@
                 <ng-container *ngFor="let col of columns">
                     <!-- Si es foto -->
                     <td *ngIf="col.field === 'foto'; else notFoto" class="min-w-16">
-                        <img [src]="item[col.field]" [alt]="item[col.field]" style="width: 64px" class="rounded" [ngStyle]="{ width: '64px' }" />
+                        <img [src]="item[col.field]" [alt]="item[col.field]" style="width: 64px" class="rounded"
+                            [ngStyle]="{ width: '64px' }" />
                     </td>
 
                     <!-- Si es rol -->
@@ -139,8 +131,10 @@
 
                 <!-- Buttons Body -->
                 <td>
-                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(item)" />
-                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(item)" />
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        (click)="editProduct(item)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="deleteProduct(item)" />
                 </td>
             </tr>
         </ng-template>
@@ -148,33 +142,24 @@
 
     <!-- Modal -->
     <!-- Modal -->
-    <p-dialog [(visible)]="itemDialog" [style]="{ width: '450px' }" header="Nuevo vendedor" [modal]="true">
+    <p-dialog [(visible)]="itemDialog" [style]="{ width: '450px' }" header="Nuevo vendedor" [modal]="true"
+        [closable]="false">
         <ng-template #content>
             <div class="flex flex-col gap-6">
-                <!-- <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image"
-                    [alt]="product.image" class="block m-auto pb-4" *ngIf="product.image" /> -->
+                <img [src]="item.foto" [alt]="item.nombre" class="block m-auto pb-4" *ngIf="isItemDialogEdit" />
                 <div class="card">
                     <div class="font-semibold text-xl mb-4">Foto</div>
-                    <p-fileupload
-                        #fileUploader
-                        name="foto"
-                        accept="image/*"
-                        maxFileSize="1000000"
-                        mode="advanced"
-                        url="https://www.primefaces.org/cdn/api/upload.php"
-                        multiple="false"
-                        fileLimit="1"
-                        formData="formData"
-                        (onSelect)="onFileChange($event)"
-                    >
+                    <p-fileupload #fileUploader name="foto" accept="image/*" maxFileSize="1000000" mode="advanced"
+                        url="https://www.primefaces.org/cdn/api/upload.php" multiple="false" fileLimit="1"
+                        formData="formData" (onSelect)="onFileChange($event)">
                         <ng-template #empty>
                             <div>Drag and drop files to here to upload.</div>
                         </ng-template>
-                        <ng-template #content>
+                        <!-- <ng-template #content>
                             <ul *ngIf="uploadedFiles.length">
                                 <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
                             </ul>
-                        </ng-template>
+                        </ng-template> -->
                     </p-fileupload>
                     <small class="text-red-500" *ngIf="submitted && !uploadedFiles">Name is required.</small>
                 </div>
@@ -187,7 +172,8 @@
 
                 <div>
                     <label for="dni" class="block font-bold mb-3">DNI</label>
-                    <input type="text" pInputText id="dni" [(ngModel)]="item.dni" required autofocus fluid />
+                    <input type="text" pInputText id="dni" [(ngModel)]="item.dni" required autofocus fluid
+                        [disabled]="isItemDialogEdit" />
                     <small class="text-red-500" *ngIf="submitted && !item.dni">Name is required.</small>
                 </div>
 
@@ -210,7 +196,9 @@
 
                 <div>
                     <label for="rol" class="block font-bold mb-3">Rol del Vendedor</label>
-                    <p-select class="w-full" [(ngModel)]="item.idRol" inputId="rol" [options]="roles" optionLabel="nombreRol" optionValue="idRol" placeholder="Selecciona un rol" fluid [appendTo]="'body'" />
+                    <p-select class="w-full" [(ngModel)]="item.idRol" inputId="rol" [options]="roles"
+                        optionLabel="nombreRol" optionValue="idRol" placeholder="Selecciona un rol" fluid
+                        [appendTo]="'body'" />
                 </div>
 
                 <div>
@@ -221,7 +209,8 @@
 
                 <div>
                     <label for="password" class="block font-bold mb-3">Contraseña</label>
-                    <input type="password" pInputText id="password" [(ngModel)]="item.password" required autofocus fluid />
+                    <input type="password" pInputText id="password" [(ngModel)]="item.password" required autofocus
+                        fluid />
                     <small class="text-red-500" *ngIf="submitted && !item.password">Password is required.</small>
                 </div>
 
@@ -267,7 +256,8 @@
 
         <ng-template #footer>
             <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-            <p-button label="Save" icon="pi pi-check" (click)="createVendedor()" />
+            <p-button label="Save" icon="pi pi-check" (click)="createVendedor()" *ngIf="!isItemDialogEdit" />
+            <p-button label="Update" icon="pi pi-check" (click)="updateVendedor()" *ngIf="isItemDialogEdit" />
         </ng-template>
     </p-dialog>
 

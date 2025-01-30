@@ -53,6 +53,7 @@ export class VendedorComponent implements OnInit {
   exportColumns!: ExportColumn[];
   columns!: Column[];
   imageUrl: string | null = null;
+  isItemDialogEdit: boolean = false;
 
 
   // Others
@@ -84,7 +85,7 @@ export class VendedorComponent implements OnInit {
 
   loadData() {
     this.vendedorService.getVendedores().subscribe((data) => {
-      console.log("Vendedores: ", data);
+      // console.log("Vendedores: ", data);
       const vendedores = data.map((vendedor: VendedorDto) => {
         const rol = this.roles.find(rol => rol.idRol === vendedor.idRol);
         return { ...vendedor, rol: rol?.nombreRol };
@@ -133,36 +134,75 @@ export class VendedorComponent implements OnInit {
 
   createVendedor() {
     // set formData
-    const formData = this.vendedorService.setFormData(this.item, this.uploadedFiles[0]);
+    let formData = new FormData();
+    try {
+      formData = this.vendedorService.setFormData(this.item, this.uploadedFiles[0]);
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: "Complete correctamente el formulario" });
+      return;
+    }
 
     // init Save Vendedor
     this.vendedorService.saveVendedor(formData).subscribe({
       error: error => {
         console.error('There was an error!', error);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error });
       },
       next: data => {
         console.log("Vendedor creado: ", data);
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Vendedor creado' });
-        //resetear item y upladoFiles
-        this.item = {};
-        //no se mano, espero haberte ayudado.
+
+        // Resetear item y uploadedFiles
+        this.fileUploader.clear();
         this.uploadedFiles = [];
+        this.item = {};
 
-        //this.submitted = false;
+        // Mostrar mensaje de éxito
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Vendedor creado' });
 
-        if (this.fileUploader) {
-          this.fileUploader.clear();
-        }
+        // Actualizar la lista de vendedores
+        this.listItems.update((items) => [...items, { ...data, rol: this.getRol(data.idRol) }]);
       }
-      
     });
     // end Save Vendedor
   }
 
   updateVendedor() {
-    // this.vendedorService.updateVendedor().subscribe((data) => {
-    //   console.log("Vendedor actualizado: ", data);
-    // });
+    // set formData
+    let formData = new FormData();
+    try {
+      formData = this.vendedorService.setFormData(this.item, this.uploadedFiles[0]);
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: "Complete correctamente el formulario" });
+      return;
+    }
+
+    this.vendedorService.updateVendedor(this.item.idVendedor!, formData).subscribe({
+      error: error => {
+        console.error('There was an error!', error);
+      },
+
+      next: data => {
+        console.log("Vendedor actualizado: ", data);
+        // Actualizar el vendedor en la lista
+        const vendedores = this.listItems().map((vendedor: VendedorDto) => {
+          if (vendedor.idVendedor === this.item.idVendedor) {
+            return { ...data, rol: this.getRol(data.idRol) };
+          }
+          return vendedor;
+        });
+
+        // Actualizar la lista de vendedores
+        this.listItems.set(vendedores);
+
+        // Resetear item y uploadedFiles
+        this.fileUploader.clear();
+        this.hideDialog();
+        this.item = {};
+
+        // Mostrar mensaje de éxito
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Vendedor actualizado' });
+      }
+    });
   }
 
   deleteVendedor() {
@@ -181,11 +221,13 @@ export class VendedorComponent implements OnInit {
     this.item = {};
     this.submitted = false;
     this.itemDialog = true;
+    this.isItemDialogEdit = false;
   }
 
   editProduct(item: Vendedor) {
     this.item = { ...item };
     this.itemDialog = true;
+    this.isItemDialogEdit = true;
   }
 
   deleteSelectedProducts() {
@@ -210,6 +252,7 @@ export class VendedorComponent implements OnInit {
     this.itemDialog = false;
     this.submitted = false;
     this.uploadedFiles = [];
+    this.isItemDialogEdit = false;
   }
 
   deleteProduct(product: Product) {
