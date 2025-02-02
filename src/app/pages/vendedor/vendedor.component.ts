@@ -161,7 +161,6 @@ export class VendedorComponent implements OnInit {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Vendedor creado' });
 
         // Actualizar la lista de vendedores
-        // TODO: Arreglar ROLES
         data.rol = this.getRol(data.idRol);
         this.listItems.update((items) => [...items, { ...data }]);
       }
