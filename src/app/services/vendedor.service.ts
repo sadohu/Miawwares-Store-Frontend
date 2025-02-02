@@ -32,6 +32,10 @@ export class VendedorService {
     return this.http.delete(`${API_ENDPOINT}/vendedores/${id}`);
   }
 
+  deleteMultiVendedores(list: any): Observable<any> {
+    return this.http.post(`${API_ENDPOINT}/vendedores/multiRemove`, { vendedores: list });
+  }
+
 
 
   setFormData(vendedor: VendedorDto, foto: any): FormData {

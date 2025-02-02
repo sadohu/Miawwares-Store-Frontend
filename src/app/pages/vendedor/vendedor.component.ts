@@ -35,7 +35,7 @@ export class VendedorComponent implements OnInit {
   // Vendedores
   itemDialog: boolean = false;
   listItems = signal<VendedorDto[]>([]);
-  selectedItems: Vendedor[] = [];
+  selectedItems: VendedorDto[] = [];
   roles: Rol[] = [];
 
   // Dialog
@@ -81,16 +81,7 @@ export class VendedorComponent implements OnInit {
   }
 
   loadData() {
-    this.vendedorService.getVendedores().subscribe((data) => {
-      // console.log("Vendedores: ", data);
-      const vendedores = data.map((vendedor: VendedorDto) => {
-        const rol = this.roles.find(rol => rol.idRol === vendedor.idRol);
-        return { ...vendedor, rol: rol?.nombreRol };
-      });
-      console.log("Vendedores1: ", vendedores);
-
-      this.listItems.set(vendedores);
-    });
+    this.getVendedores();
 
     this.statuses = [
       { label: 'INSTOCK', value: 'instock' },
@@ -118,7 +109,14 @@ export class VendedorComponent implements OnInit {
   /* INIT CRUD VENDEDORES */
   getVendedores() {
     this.vendedorService.getVendedores().subscribe((data) => {
-      console.log("Vendedores: ", data);
+      // console.log("Vendedores: ", data);
+      const vendedores = data.map((vendedor: VendedorDto) => {
+        const rol = this.roles.find(rol => rol.idRol === vendedor.idRol);
+        return { ...vendedor, rol: rol?.nombreRol };
+      });
+      // console.log("Vendedores1: ", vendedores);
+
+      this.listItems.set(vendedores);
     });
   }
 
@@ -277,7 +275,44 @@ export class VendedorComponent implements OnInit {
   /* FIN ACTUALIZAR ESTADO VENDEDOR */
 
   /* INIT ELIMINACION MULTIPLE */
-  deleteSelectedProducts() { }
+  deleteMultipleItem() {
+    SwalCustoms.confirm("¿Estás seguro de eliminar a los vendedores seleccionados?", "No podrás revertir esta acción").then((result: any) => {
+      // Si el usuario confirma
+      if (result) {
+        // Validar que se haya seleccionado al menos un vendedor
+        if (this.selectedItems.length === 0) {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Selecciona al menos un vendedor' });
+          return;
+        }
+
+        // Custom body (documentación de la API)
+        const vendedores = this.selectedItems.map((vendedor: VendedorDto) => {
+          return { id: vendedor.idVendedor };
+        })
+
+        console.log("Vendedores seleccionados: ", vendedores);
+
+        // Llamar al servicio para eliminar los vendedores
+        this.vendedorService.deleteMultiVendedores(vendedores).subscribe({
+          error: error => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error });
+          },
+          next: data => {
+            // console.log("Vendedores eliminados: ", data);
+            const { message } = data;
+            // Eliminar los vendedores de la lista segun el id
+            const vendedores = this.listItems().filter((vendedor: VendedorDto) => !this.selectedItems.some((item) => item.idVendedor === vendedor.idVendedor));
+
+            // Actualizar la lista de vendedores
+            this.listItems.set(vendedores);
+
+            // Mostrar mensaje de éxito
+            this.messageService.add({ severity: 'info', summary: 'Info', detail: message });
+          }
+        });
+      }
+    });
+  }
   /* FIN ELIMINACION MULTIPLE */
 
 
