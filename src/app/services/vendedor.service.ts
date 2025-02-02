@@ -24,6 +24,10 @@ export class VendedorService {
     return this.http.put(`${API_ENDPOINT}/vendedores/${id}`, formData);
   }
 
+  updateEstadoVendedor(id: number): Observable<any> {
+    return this.http.patch(`${API_ENDPOINT}/vendedores/estado/${id}`, null);
+  }
+
   deleteVendedor(id: number): Observable<any> {
     return this.http.delete(`${API_ENDPOINT}/vendedores/${id}`);
   }

@@ -10,4 +10,5 @@ export class VendedorDto {
     password?: string;
     idRol?: number;
     rol?: string;
+    estado?: boolean;
 }

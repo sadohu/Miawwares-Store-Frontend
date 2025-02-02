@@ -10,4 +10,5 @@ export class Vendedor {
     email?: string;
     password?: string;
     idRol?: number;
+    estado?: boolean;
 }

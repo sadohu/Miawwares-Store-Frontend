@@ -22,6 +22,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { DropdownModule } from 'primeng/dropdown';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 // PrimeNG services
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -49,6 +50,7 @@ export const SHARED_MODULES = [
   ConfirmDialogModule,
   FileUploadModule,
   DropdownModule,
+  ToggleSwitchModule,
 ];
 
 export const SHARED_SERVICES = [ConfirmationService, MessageService];
