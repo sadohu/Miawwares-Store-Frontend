@@ -94,16 +94,27 @@
 
                 <ng-container *ngFor="let col of columns">
                     <!-- Si es foto -->
-                    <td *ngIf="col.field === 'foto'; else notFoto" class="min-w-16">
+                    <td *ngIf="col.field === 'foto'; else rolField" class="min-w-16">
                         <img [src]="item[col.field]" [alt]="item[col.field]" style="width: 64px" class="rounded"
                             [ngStyle]="{ width: '64px' }" />
                     </td>
 
                     <!-- Si es rol -->
-                    <ng-template #notFoto>
-                        <td *ngIf="col.field === 'rol'; else otherField" class="min-w-32">
+                    <ng-template #rolField>
+                        <td *ngIf="col.field === 'rol'; else estadoField" class="min-w-32">
                             <!-- <p-tag  [value]="getRol(item[col.field])" [severity]="getSeverity(item[col.field])" /> -->
                             <p-tag [value]="item[col.field]" [severity]="getSeverity(item[col.field])" />
+                        </td>
+                    </ng-template>
+
+                    <!-- Si es estado -->
+                    <ng-template #estadoField>
+                        <td *ngIf="col.field === 'estado'; else otherField" class="min-w-32">
+                            <p-toggleSwitch #switchEstado [(ngModel)]="item[col.field]"
+                                (onChange)="stateChange(item, switchEstado)" />
+                            <span class="ml-2">{{ item[col.field] ? 'Activo' : 'Inactivo'
+                                }}</span>
+
                         </td>
                     </ng-template>
 

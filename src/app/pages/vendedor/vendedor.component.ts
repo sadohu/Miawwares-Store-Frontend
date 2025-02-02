@@ -32,17 +32,16 @@ interface ExportColumn {
 })
 export class VendedorComponent implements OnInit {
 
-  @ViewChild('fileUploader') fileUploader: any;
   // Vendedores
   itemDialog: boolean = false;
-  // listItems: Vendedor[] = [];
   listItems = signal<VendedorDto[]>([]);
   selectedItems: Vendedor[] = [];
   roles: Rol[] = [];
+
   // Dialog
   item!: VendedorDto;
   uploadedFiles: File[] = [];
-
+  @ViewChild('fileUploader') fileUploader: any;
 
   // Utils
   msgs: ToastMessageOptions[] | null = [];
@@ -56,13 +55,10 @@ export class VendedorComponent implements OnInit {
   imageUrl: string | null = null;
   isItemDialogEdit: boolean = false;
 
-
   // Others
   products = signal<Product[]>([]);
   product!: Product;
   selectedProducts!: Product[] | null;
-
-
 
   constructor(
     private productService: ProductService,
@@ -111,19 +107,26 @@ export class VendedorComponent implements OnInit {
       { field: 'email', header: 'Email' },
       { field: 'username', header: 'Usuario' },
       { field: 'rol', header: 'Rol' },
+      { field: 'estado', header: 'Estado' },
     ];
 
     this.exportColumns = this.columns.map((col) => ({ title: col.header, dataKey: col.field }));
 
   }
 
-  // INIT CRUD VENDEDORES
+
+  /* INIT CRUD VENDEDORES */
   getVendedores() {
     this.vendedorService.getVendedores().subscribe((data) => {
       console.log("Vendedores: ", data);
     });
   }
 
+  /**
+     * Evento que se dispara al seleccionar un archivo
+     * @param event Evento de cambio de archivo
+     * @returns void
+     */
   onFileChange(event: any) {
     const file = event.files[0]; // Obtener el primer archivo subido
     if (file) {
@@ -131,7 +134,6 @@ export class VendedorComponent implements OnInit {
       console.log("Archivo seleccionado: ", file);
     }
   }
-
 
   createVendedor() {
     // set formData
@@ -230,13 +232,63 @@ export class VendedorComponent implements OnInit {
       }
     });
   }
+  /* END CRUD VENDEDORES */
 
-  // END CRUD VENDEDORES
 
+  /* INICIO ACTUALIZAR ESTADO VENDEDOR */
+  stateChange(item: Vendedor, toggle: any) {
+    SwalCustoms.confirm(`¿Estás seguro de cambiar el estado de ${item.nombre} a ${item.estado ? 'Activo' : 'Inactivo'}`, "Podrás revertir esta acción luego").then((result: any) => {
+      // Si el usuario confirma
+      if (result) {
+        // Deshabilitar el toggle
+        toggle.readonly = true;
+
+        // Actualizar el estado del vendedor
+        this.vendedorService.updateEstadoVendedor(item.idVendedor!).subscribe({
+          error: error => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al actualizar al Empleado' });
+            // Habilitar el toggle y revertir el estado
+            toggle.readonly = false;
+            item.estado = !item.estado;
+          },
+          next: data => {
+            // console.log("Vendedor actualizado: ", data);
+            const { message, vendedor } = data;
+
+            // Actualizar el vendedor en la lista
+            item.estado = vendedor.estado;
+
+            // Mostrar mensaje de éxito
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
+
+            // Habilitar el toggle
+            toggle.readonly = false;
+          }
+        });
+      }
+
+      // Si el usuario cancela
+      else {
+        item.estado = !item.estado;
+      }
+    });
+  }
+
+  /* FIN ACTUALIZAR ESTADO VENDEDOR */
+
+  /* INIT ELIMINACION MULTIPLE */
+  deleteSelectedProducts() { }
+  /* FIN ELIMINACION MULTIPLE */
+
+
+  /* INICIO FILTRO GLOBAL */
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
+  /* FIN FILTRO GLOBAL */
 
+
+  /* INICIO ACCIONES DEL DIALOG */
   openNew() {
     this.item = {};
     this.submitted = false;
@@ -250,69 +302,14 @@ export class VendedorComponent implements OnInit {
     this.isItemDialogEdit = true;
   }
 
-  deleteSelectedProducts() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected products?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.products.set(this.products().filter((val) => !this.selectedProducts?.includes(val)));
-        this.selectedProducts = null;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Products Deleted',
-          life: 3000
-        });
-      }
-    });
-  }
-
   hideDialog() {
     this.itemDialog = false;
     this.submitted = false;
     this.uploadedFiles = [];
     this.isItemDialogEdit = false;
   }
+  /* FIN ACCIONES DEL DIALOG  */
 
-  deleteProduct(product: Product) {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + product.name + '?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.products.set(this.products().filter((val) => val.id !== product.id));
-        this.product = {};
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Deleted',
-          life: 3000
-        });
-      }
-    });
-  }
-
-  findIndexById(id: string): number {
-    let index = -1;
-    for (let i = 0; i < this.products().length; i++) {
-      if (this.products()[i].id === id) {
-        index = i;
-        break;
-      }
-    }
-
-    return index;
-  }
-
-  createId(): string {
-    let id = '';
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
 
   // INICIO ESTILOS PARA TABLA
   getSeverity(rol: string) {
@@ -334,33 +331,4 @@ export class VendedorComponent implements OnInit {
   }
   // FIN ESTILOS PARA TABLA
 
-  saveProduct() {
-    this.submitted = true;
-    let _products = this.products();
-    if (this.product.name?.trim()) {
-      if (this.product.id) {
-        _products[this.findIndexById(this.product.id)] = this.product;
-        this.products.set([..._products]);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Updated',
-          life: 3000
-        });
-      } else {
-        this.product.id = this.createId();
-        this.product.image = 'product-placeholder.svg';
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Created',
-          life: 3000
-        });
-        this.products.set([..._products, this.product]);
-      }
-
-      this.productDialog = false;
-      this.product = {};
-    }
-  }
 }
